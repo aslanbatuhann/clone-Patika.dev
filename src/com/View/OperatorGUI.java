@@ -51,37 +51,49 @@ public class OperatorGUI extends JFrame {
         Object[] col_user_list = {"ID", "Ad Soyad", "Kullanıcı Adı", "Şifre", "Üyelik Tipi"};
         mdl_user_list.setColumnIdentifiers(col_user_list);
 
-        for (User user : User.getList()) {
+        row_user_list = new Object[col_user_list.length];
 
-            Object[] row = new Object[col_user_list.length];
-            row[0]=user.getId();
-            row[1]=user.getName();
-            row[2]=user.getUserName();
-            row[3]=user.getPassword();
-            row[4]=user.getUserType();
-            mdl_user_list.addRow(row);
-        }
+        loadUserModel();
+
 
         tbl_userlist.setModel(mdl_user_list);
         tbl_userlist.getTableHeader().setReorderingAllowed(false);
 
 
         btn_useradd.addActionListener(e -> {
-                if(Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_username) || Helper.isFieldEmpty(fld_user_password) ){
-                    Helper.showMsg("fill");
-                }else {
-                    String name = fld_user_name.getText();
-                    String userName= fld_username.getText();
-                    String password=fld_user_password.getText();
-                    String type =cmb_usertype.getSelectedItem().toString();
+            if (Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_username) || Helper.isFieldEmpty(fld_user_password)) {
+                Helper.showMsg("fill");
+            } else {
+                String name = fld_user_name.getText();
+                String userName = fld_username.getText();
+                String password = fld_user_password.getText();
+                String type = cmb_usertype.getSelectedItem().toString();
 
-                    if(User.add(name,userName,password,type)){
-                        Helper.showMsg("success");
-                    }else {
-                        Helper.showMsg("error");
-                    }
+                if (User.add(name, userName, password, type)) {
+                    Helper.showMsg("success");
+                    loadUserModel();
+                    fld_user_name.setText(null);
+                    fld_username.setText(null);
+                    fld_user_password.setText(null);
                 }
+            }
         });
+    }
+
+    public void loadUserModel() {
+
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_userlist.getModel();
+        clearModel.setRowCount(0);
+        for (User user : User.getList()) {
+
+            int i = 0;
+            row_user_list[i++] = user.getId();
+            row_user_list[i++] = user.getName();
+            row_user_list[i++] = user.getUserName();
+            row_user_list[i++] = user.getPassword();
+            row_user_list[i++] = user.getUserType();
+            mdl_user_list.addRow(row_user_list);
+        }
     }
 
     public static void main(String[] args) {

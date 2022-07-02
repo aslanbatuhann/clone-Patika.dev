@@ -54,6 +54,7 @@ public class Helper {
                 msg="Bir Hata Oluştu.";
                 title="HATA";
                 break;
+
             default:
                 msg = str;
                 title="Mesaj";
