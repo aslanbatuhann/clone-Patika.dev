@@ -7,6 +7,8 @@ import com.model.User;
 
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 public class OperatorGUI extends JFrame {
 
@@ -18,6 +20,12 @@ public class OperatorGUI extends JFrame {
     private JPanel pnl_userList;
     private JScrollPane scrl_userlist;
     private JTable tbl_userlist;
+    private JPanel pnl_userform;
+    private JTextField fld_user_name;
+    private JTextField fld_username;
+    private JTextField fld_user_password;
+    private JComboBox cmb_usertype;
+    private JButton btn_useradd;
     private DefaultTableModel mdl_user_list;
     private Object[] row_user_list;
 
@@ -58,6 +66,22 @@ public class OperatorGUI extends JFrame {
         tbl_userlist.getTableHeader().setReorderingAllowed(false);
 
 
+        btn_useradd.addActionListener(e -> {
+                if(Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_username) || Helper.isFieldEmpty(fld_user_password) ){
+                    Helper.showMsg("fill");
+                }else {
+                    String name = fld_user_name.getText();
+                    String userName= fld_username.getText();
+                    String password=fld_user_password.getText();
+                    String type =cmb_usertype.getSelectedItem().toString();
+
+                    if(User.add(name,userName,password,type)){
+                        Helper.showMsg("success");
+                    }else {
+                        Helper.showMsg("error");
+                    }
+                }
+        });
     }
 
     public static void main(String[] args) {

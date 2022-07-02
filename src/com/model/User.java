@@ -2,6 +2,7 @@ package com.model;
 
 import com.Helper.DBConnector;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -86,5 +87,26 @@ public class User {
             throw new RuntimeException(e);
         }
         return userArrayList;
+    }
+
+
+    public static boolean add(String name,String userName,String password,String userType){
+
+        String query ="INSERT INTO user (name,username,password,usertype) VALUES (?,?,?,?)";
+            boolean key = true;
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1,name);
+            pr.setString(2,userName);
+            pr.setString(3,password);
+            pr.setString(4,userType);
+           key = pr.executeUpdate() != -1;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+
+
+        return key;
     }
 }
