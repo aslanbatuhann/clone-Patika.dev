@@ -10,13 +10,14 @@ import java.sql.Statement;
 import java.util.ArrayList;
 
 public class User {
-    private int id ;
+    private int id;
     private String name;
     private String userName;
     private String password;
     private String userType;
 
-    public User(){}
+    public User() {
+    }
 
     public User(int id, String name, String userName, String password, String userType) {
         this.id = id;
@@ -66,7 +67,7 @@ public class User {
         this.userType = userType;
     }
 
-    public static ArrayList<User> getList(){
+    public static ArrayList<User> getList() {
         ArrayList<User> userArrayList = new ArrayList<>();
         String query = "SELECT * FROM user";
         User obj;
@@ -74,7 +75,7 @@ public class User {
             Statement st = DBConnector.getInstance().createStatement();
 
             ResultSet resultSet = st.executeQuery(query);
-            while (resultSet.next()){
+            while (resultSet.next()) {
                 obj = new User();
                 obj.setId(resultSet.getInt("id"));
                 obj.setName(resultSet.getString("name"));
@@ -93,25 +94,25 @@ public class User {
     }
 
 
-    public static boolean add(String name,String userName,String password,String userType){
+    public static boolean add(String name, String userName, String password, String userType) {
 
-        String query ="INSERT INTO user (name,username,password,usertype) VALUES (?,?,?,?)";
+        String query = "INSERT INTO user (name,username,password,usertype) VALUES (?,?,?,?)";
         User findUser = User.getFetch(userName);
 
-        if(findUser != null ){
+        if (findUser != null) {
             Helper.showMsg("Farklı Kullanıcı adı giriniz.");
             return false;
         }
 
-            boolean key = true;
+        boolean key = true;
         try {
             PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
-            pr.setString(1,name);
-            pr.setString(2,userName);
-            pr.setString(3,password);
-            pr.setString(4,userType);
-           key = pr.executeUpdate() != -1;
-           pr.close();
+            pr.setString(1, name);
+            pr.setString(2, userName);
+            pr.setString(3, password);
+            pr.setString(4, userType);
+            key = pr.executeUpdate() != -1;
+            pr.close();
 
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -121,15 +122,15 @@ public class User {
         return key;
     }
 
-    public static User getFetch(String userName){
+    public static User getFetch(String userName) {
         User obj = null;
         String query = "SELECT * FROM user WHERE username = ?";
 
         try {
             PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
-            pr.setString(1,userName);
+            pr.setString(1, userName);
             ResultSet rs = pr.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 obj = new User();
                 obj.setId(rs.getInt("id"));
                 obj.setName(rs.getString("name"));
@@ -142,5 +143,18 @@ public class User {
             throw new RuntimeException(e);
         }
         return obj;
+    }
+
+    public static boolean delete(int id) {
+        String query = "DELETE FROM user WHERE id = ?";
+        boolean key = true;
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1, id);
+            key = pr.executeUpdate() != -1;
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return key;
     }
 }

@@ -26,6 +26,8 @@ public class OperatorGUI extends JFrame {
     private JTextField fld_user_password;
     private JComboBox cmb_usertype;
     private JButton btn_useradd;
+    private JTextField fld_userID;
+    private JButton btn_user_delete;
     private DefaultTableModel mdl_user_list;
     private Object[] row_user_list;
 
@@ -47,7 +49,16 @@ public class OperatorGUI extends JFrame {
         lbl_welcome.setText("Hoşgeldin : " + operator.getName());
 
         //modelUserList
-        mdl_user_list = new DefaultTableModel();
+        mdl_user_list = new DefaultTableModel(){
+            //method override ID column düzeltilmeye kapatıldı
+            @Override
+            public boolean isCellEditable(int row, int column) {
+                if(column == 0)
+                    return false;
+                return super.isCellEditable(row, column);
+            }
+        };
+
         Object[] col_user_list = {"ID", "Ad Soyad", "Kullanıcı Adı", "Şifre", "Üyelik Tipi"};
         mdl_user_list.setColumnIdentifiers(col_user_list);
 
@@ -75,6 +86,22 @@ public class OperatorGUI extends JFrame {
                     fld_user_name.setText(null);
                     fld_username.setText(null);
                     fld_user_password.setText(null);
+                }
+            }
+        });
+        btn_user_delete.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(Helper.isFieldEmpty(fld_userID)){
+                    Helper.showMsg("fill");
+                }else{
+                    int userID = Integer.parseInt(fld_userID.getText());
+                    if(User.delete(userID)){
+                        Helper.showMsg("success");
+                        loadUserModel();
+                    }else{
+                        Helper.showMsg("error");
+                    }
                 }
             }
         });
