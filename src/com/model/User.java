@@ -145,6 +145,7 @@ public class User {
         return obj;
     }
 
+
     public static boolean delete(int id) {
         String query = "DELETE FROM user WHERE id = ?";
         boolean key = true;
@@ -156,5 +157,77 @@ public class User {
             throw new RuntimeException(e);
         }
         return key;
+    }
+
+
+    public static boolean update(int id, String name, String uname, String pass, String type) {
+        String query = "UPDATE user SET name = ? , username= ?,password = ?,usertype=? WHERE  id = ?";
+        //kullanıcı adı güncellemesini sorgulamak için eklenen kısım
+        User findUser = User.getFetch(uname);
+        if (findUser != null && findUser.getId() != id) {
+            Helper.showMsg("Bu kullanıcı adı daha önceden eklenmis.");
+            return false;
+        }
+       /* ArrayList<String> usertype = new ArrayList<String>();
+        usertype.add("operator");
+        usertype.add("student");
+        usertype.add("educator");
+        User findtype = User.getFetch(uname);
+        if (findtype != null && findtype.getUserType() != usertype.get(0) && findtype.getUserType() != usertype.get(1) && findtype.getUserType() != usertype.get(2)) {
+            Helper.showMsg("yanlış tip seçimi yaptınız");
+            return false;
+        }*/
+
+        boolean key = true;
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1, name);
+            pr.setString(2, uname);
+            pr.setString(3, pass);
+            pr.setString(4, type);
+            pr.setInt(5, id);
+            key = pr.executeUpdate() != -1;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return key;
+
+    }
+
+    public static ArrayList<User> searchUserList(String query) {
+        ArrayList<User> userArrayList = new ArrayList<>();
+        User obj;
+        try {
+            Statement st = DBConnector.getInstance().createStatement();
+
+            ResultSet resultSet = st.executeQuery(query);
+            while (resultSet.next()) {
+                obj = new User();
+                obj.setId(resultSet.getInt("id"));
+                obj.setName(resultSet.getString("name"));
+                obj.setUserName(resultSet.getString("username"));
+                obj.setPassword(resultSet.getString("password"));
+                obj.setUserType(resultSet.getString("usertype"));
+
+                userArrayList.add(obj);
+            }
+            st.close();
+            resultSet.close();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return userArrayList;
+    }
+
+    public static String searchQuery(String name, String uname, String type) {
+        String query = "SELECT * FROM user WHERE username LIKE '%{{uname}}%' AND name LIKE '%{{name}}%'";
+        query=query.replace("{{uname}}",uname);
+        query=query.replace("{{name}}",name);
+        if(!type.isEmpty()){
+            query+="AND usertype ='{{type}}'";
+            query=query.replace("{{type}}",type);
+        }
+        return query;
     }
 }

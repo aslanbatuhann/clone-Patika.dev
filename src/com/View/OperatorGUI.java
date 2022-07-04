@@ -6,9 +6,11 @@ import com.model.Operator;
 import com.model.User;
 
 import javax.swing.*;
+import javax.swing.event.TableModelEvent;
 import javax.swing.table.DefaultTableModel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 
 public class OperatorGUI extends JFrame {
 
@@ -28,6 +30,10 @@ public class OperatorGUI extends JFrame {
     private JButton btn_useradd;
     private JTextField fld_userID;
     private JButton btn_user_delete;
+    private JTextField fld_srch_user_name;
+    private JTextField flf_srch_user_uname;
+    private JComboBox cmb_srch_usertype;
+    private JButton btn_srch_user;
     private DefaultTableModel mdl_user_list;
     private Object[] row_user_list;
 
@@ -70,6 +76,25 @@ public class OperatorGUI extends JFrame {
         tbl_userlist.setModel(mdl_user_list);
         tbl_userlist.getTableHeader().setReorderingAllowed(false);
 
+        //tablo üzerinden verileri güncellemek için eklenen kısım
+
+        tbl_userlist.getModel().addTableModelListener(e -> {
+            if(e.getType() == TableModelEvent.UPDATE){
+                int user_id = Integer.parseInt(tbl_userlist.getValueAt(tbl_userlist.getSelectedRow(),0).toString());
+                String user_name = tbl_userlist.getValueAt(tbl_userlist.getSelectedRow(),1).toString();
+                String user_uname = tbl_userlist.getValueAt(tbl_userlist.getSelectedRow(),2).toString();
+                String user_pass = tbl_userlist.getValueAt(tbl_userlist.getSelectedRow(),3).toString();
+                String user_type = tbl_userlist.getValueAt(tbl_userlist.getSelectedRow(),4).toString();
+
+                if(User.update(user_id,user_name,user_uname,user_pass,user_type)){
+                    Helper.showMsg("success");
+                    loadUserModel();
+                }else{
+                    Helper.showMsg("error");
+                }
+            }
+        });
+
 
         btn_useradd.addActionListener(e -> {
             if (Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_username) || Helper.isFieldEmpty(fld_user_password)) {
@@ -105,6 +130,20 @@ public class OperatorGUI extends JFrame {
                 }
             }
         });
+
+
+        btn_srch_user.addActionListener(e -> {
+            String name = fld_srch_user_name.getText();
+            String uname= flf_srch_user_uname.getText();
+            String type = cmb_srch_usertype.getSelectedItem().toString();
+
+            String query = User.searchQuery(name,uname,type);
+
+            ArrayList<User> searchingUser = User.searchUserList(query);
+
+            loadUserModel(searchingUser);
+
+        });
     }
 
     public void loadUserModel() {
@@ -112,6 +151,21 @@ public class OperatorGUI extends JFrame {
         DefaultTableModel clearModel = (DefaultTableModel) tbl_userlist.getModel();
         clearModel.setRowCount(0);
         for (User user : User.getList()) {
+
+            int i = 0;
+            row_user_list[i++] = user.getId();
+            row_user_list[i++] = user.getName();
+            row_user_list[i++] = user.getUserName();
+            row_user_list[i++] = user.getPassword();
+            row_user_list[i++] = user.getUserType();
+            mdl_user_list.addRow(row_user_list);
+        }
+    }
+    public void loadUserModel(ArrayList<User> List) {
+
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_userlist.getModel();
+        clearModel.setRowCount(0);
+        for (User user : List) {
 
             int i = 0;
             row_user_list[i++] = user.getId();
