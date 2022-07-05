@@ -47,18 +47,31 @@ public class Helper {
                 title = "Hata";
                 break;
             case "success":
-                msg="İşlem Başarılı";
-                title="Sonuç";
+                msg = "İşlem Başarılı";
+                title = "Sonuç";
                 break;
             case "error":
-                msg="Bir Hata Oluştu.";
-                title="HATA";
+                msg = "Bir Hata Oluştu.";
+                title = "HATA";
                 break;
 
             default:
                 msg = str;
-                title="Mesaj";
+                title = "Mesaj";
         }
-        JOptionPane.showMessageDialog(null, msg, title,JOptionPane.INFORMATION_MESSAGE );
+        JOptionPane.showMessageDialog(null, msg, title, JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    // işlemi yapmak istediğinden  emin misin? uyarısı
+    public static boolean confirm(String str) {
+        String msg;
+        switch (str) {
+            case "sure":
+                msg = "Bu işlemden emin misiniz.";
+                break;
+            default:
+                msg = str;
+        }
+        return JOptionPane.showConfirmDialog(null, msg, "Uyarı", JOptionPane.YES_OPTION) == 0;
     }
 }

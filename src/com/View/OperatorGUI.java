@@ -2,6 +2,7 @@ package com.View;
 
 import com.Helper.Config;
 import com.Helper.Helper;
+import com.model.Course;
 import com.model.Operator;
 import com.model.Patika;
 import com.model.User;
@@ -42,11 +43,22 @@ public class OperatorGUI extends JFrame {
     private JLabel lbl_patika_add;
     private JTextField fld_patika_addname;
     private JButton btn_patika_add;
+    private JPanel pnl_course_list;
+    private JScrollPane scrl_course_list;
+    private JTable tbl_course_list;
+    private JPanel pnl_course_add;
+    private JTextField fld_course_name;
+    private JTextField fld_course_lang;
+    private JButton btn_course_add;
+    private JComboBox cmb_course_patika;
+    private JComboBox cmb_course_user;
     private DefaultTableModel mdl_user_list;
     private Object[] row_user_list;
     private DefaultTableModel mdl_patika_list;
     private Object[] row_patika_list;
     private JPopupMenu patikaMenu;
+    private DefaultTableModel mdl_course_list;
+    private Object[] row_course_list;
 
     private final Operator operator;
 
@@ -127,7 +139,15 @@ public class OperatorGUI extends JFrame {
         });
 
         deleteMenu.addActionListener(e -> {
-            int select_id = Integer.parseInt(tbl_patika_list.getValueAt(tbl_patika_list.getSelectedRow(), 0).toString());
+            if (Helper.confirm("sure")) {
+                int select_id = Integer.parseInt(tbl_patika_list.getValueAt(tbl_patika_list.getSelectedRow(), 0).toString());
+                if (Patika.delete(select_id)) {
+                    Helper.showMsg("success");
+                    loadPatikaModel();
+                } else {
+                    Helper.showMsg("error");
+                }
+            }
 
         });
         //** patikalar tablosunda popup menu işlemleri
@@ -158,6 +178,18 @@ public class OperatorGUI extends JFrame {
         });
         //modelPatikaList
 
+        //modelCourseList
+        mdl_course_list = new DefaultTableModel();
+        Object[] col_courseList = {"ID", "Course Name", "Programming language", "Patika", "Educator"};
+        mdl_course_list.setColumnIdentifiers(col_courseList);
+        row_course_list = new Object[col_courseList.length];
+        loadCourseList();
+
+        tbl_course_list.setModel(mdl_course_list);
+        tbl_course_list.getColumnModel().getColumn(0).setMaxWidth(75);
+        tbl_course_list.getTableHeader().setReorderingAllowed(false);
+
+        //modelCourseList
         btn_useradd.addActionListener(e -> {
             if (Helper.isFieldEmpty(fld_user_name) || Helper.isFieldEmpty(fld_username) || Helper.isFieldEmpty(fld_user_password)) {
                 Helper.showMsg("fill");
@@ -182,12 +214,15 @@ public class OperatorGUI extends JFrame {
                 if (Helper.isFieldEmpty(fld_userID)) {
                     Helper.showMsg("fill");
                 } else {
-                    int userID = Integer.parseInt(fld_userID.getText());
-                    if (User.delete(userID)) {
-                        Helper.showMsg("success");
-                        loadUserModel();
-                    } else {
-                        Helper.showMsg("error");
+                    //silme işleminde emin misiniz ?
+                    if (Helper.confirm("sure")) {
+                        int userID = Integer.parseInt(fld_userID.getText());
+                        if (User.delete(userID)) {
+                            Helper.showMsg("success");
+                            loadUserModel();
+                        } else {
+                            Helper.showMsg("error");
+                        }
                     }
                 }
             }
@@ -214,7 +249,7 @@ public class OperatorGUI extends JFrame {
                 Helper.showMsg("fill");
             } else {
                 if (Patika.add(fld_patika_addname.getText())) {
-                    Helper.showMsg("succsess");
+                    Helper.showMsg("success");
                     loadPatikaModel();
                     fld_patika_addname.setText(null);
                 } else {
@@ -222,6 +257,21 @@ public class OperatorGUI extends JFrame {
                 }
             }
         });
+    }
+
+    private void loadCourseList() {
+        DefaultTableModel clearModel = (DefaultTableModel) tbl_course_list.getModel();
+        clearModel.setRowCount(0);
+        int i;
+        for (Course obj : Course.getList()) {
+            i = 0;
+            row_course_list[i++] = obj.getId();
+            row_course_list[i++] = obj.getName();
+            row_course_list[i++] = obj.getLang();
+            row_course_list[i++] = obj.getPatika().getName();
+            row_course_list[i++] = obj.getEducator().getName();
+                    mdl_course_list.addRow(row_course_list);
+        }
     }
 
     private void loadPatikaModel() {
