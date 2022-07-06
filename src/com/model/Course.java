@@ -2,6 +2,7 @@ package com.model;
 
 import com.Helper.DBConnector;
 
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -96,12 +97,27 @@ public class Course {
                 int patika_id = rs.getInt("patika_id");
                 String name = rs.getString("name");
                 String lang = rs.getString("lang");
-                obj = new Course(id,user_id,patika_id,name,lang);
+                obj = new Course(id, user_id, patika_id, name, lang);
                 courseList.add(obj);
             }
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
         return courseList;
+    }
+
+    public static boolean add(int user_id, int patika_id, String name, String lang) {
+        String query = "INSERT INTO course (user_id,patika_id,name,lang) VALUES (?,?,?,?)";
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setInt(1, user_id);
+            pr.setInt(2, patika_id);
+            pr.setString(3, name);
+            pr.setString(4, lang);
+            return pr.executeUpdate() != -1;
+
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 }
