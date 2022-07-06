@@ -117,6 +117,7 @@ public class OperatorGUI extends JFrame {
                 }
                 loadUserModel();
                 loadEducatorCombo();
+                loadCourseModel();
             }
         });
         //modelUserList
@@ -136,7 +137,7 @@ public class OperatorGUI extends JFrame {
                 public void windowClosed(WindowEvent e) {
                     loadPatikaModel();
                     loadPatikaCombo();
-
+                    loadCourseModel();
                 }
             });
         });
@@ -148,6 +149,7 @@ public class OperatorGUI extends JFrame {
                     Helper.showMsg("success");
                     loadPatikaModel();
                     loadPatikaCombo();
+                    loadCourseModel();
 
                 } else {
                     Helper.showMsg("error");
@@ -219,22 +221,20 @@ public class OperatorGUI extends JFrame {
                 }
             }
         });
-        btn_user_delete.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (Helper.isFieldEmpty(fld_userID)) {
-                    Helper.showMsg("fill");
-                } else {
-                    //silme işleminde emin misiniz ?
-                    if (Helper.confirm("sure")) {
-                        int userID = Integer.parseInt(fld_userID.getText());
-                        if (User.delete(userID)) {
-                            Helper.showMsg("success");
-                            loadUserModel();
-                            loadEducatorCombo();
-                        } else {
-                            Helper.showMsg("error");
-                        }
+        btn_user_delete.addActionListener(e -> {
+            if (Helper.isFieldEmpty(fld_userID)) {
+                Helper.showMsg("fill");
+            } else {
+                //silme işleminde emin misiniz ?
+                if (Helper.confirm("sure")) {
+                    int userID = Integer.parseInt(fld_userID.getText());
+                    if (User.delete(userID)) {
+                        Helper.showMsg("success");
+                        loadUserModel();
+                        loadEducatorCombo();
+                        loadCourseModel();
+                    } else {
+                        Helper.showMsg("error");
                     }
                 }
             }
@@ -276,15 +276,15 @@ public class OperatorGUI extends JFrame {
         btn_course_add.addActionListener(e -> {
             Item patikaItem = (Item) cmb_course_patika.getSelectedItem();
             Item userItem = (Item) cmb_course_user.getSelectedItem();
-            if (Helper.isFieldEmpty(fld_course_name)||Helper.isFieldEmpty(fld_course_lang)){
+            if (Helper.isFieldEmpty(fld_course_name) || Helper.isFieldEmpty(fld_course_lang)) {
                 Helper.showMsg("fill");
-            }else{
-                if (Course.add(userItem.getKey(),patikaItem.getKey(),fld_course_name.getText(),fld_course_lang.getText())){
+            } else {
+                if (Course.add(userItem.getKey(), patikaItem.getKey(), fld_course_name.getText(), fld_course_lang.getText())) {
                     Helper.showMsg("success");
                     loadCourseModel();
                     fld_course_lang.setText(null);
                     fld_course_name.setText(null);
-                }else {
+                } else {
                     Helper.showMsg("error");
                 }
 

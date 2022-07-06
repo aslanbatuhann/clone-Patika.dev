@@ -171,10 +171,16 @@ public class User {
 
     public static boolean delete(int id) {
         String query = "DELETE FROM user WHERE id = ?";
+        ArrayList<Course> courseArrayList = Course.getListByUser(id);
+        for (Course course : courseArrayList){
+            Course.delete(course.getId());
+        }
+
         boolean key = true;
         try {
             PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
             pr.setInt(1, id);
+
             key = pr.executeUpdate() != -1;
         } catch (SQLException e) {
             throw new RuntimeException(e);
