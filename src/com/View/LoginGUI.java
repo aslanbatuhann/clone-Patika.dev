@@ -2,6 +2,8 @@ package com.View;
 
 import com.Helper.Config;
 import com.Helper.Helper;
+import com.model.Operator;
+import com.model.User;
 
 import javax.swing.*;
 import java.awt.event.ActionEvent;
@@ -26,10 +28,26 @@ public class LoginGUI extends JFrame {
 
 
         btn_login.addActionListener(e -> {
-            if (Helper.isFieldEmpty(fld_user_uname)||Helper.isFieldEmpty(fld_user_pass)){
+            if (Helper.isFieldEmpty(fld_user_uname) || Helper.isFieldEmpty(fld_user_pass)) {
                 Helper.showMsg("fill");
-            }else{
-
+            } else {
+                User user = User.getFetch(fld_user_uname.getText(), fld_user_pass.getText());
+                if (user == null) {
+                    Helper.showMsg("Kullanıcı Bulunamadı.");
+                } else {
+                    switch (user.getUserType()){
+                        case "operator":
+                            OperatorGUI operatorGUI = new OperatorGUI((Operator) user);
+                            break;
+                        case "educator":
+                            EducatorGUI educatorGUI = new EducatorGUI();
+                            break;
+                        case "student":
+                            StudentGUI studentGUI = new StudentGUI();
+                            break;
+                    }
+                    dispose();
+                }
             }
 
         });

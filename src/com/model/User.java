@@ -168,11 +168,43 @@ public class User {
         return obj;
     }
 
+    //login işlemi için
+    public static User getFetch(String uName, String password) {
+        User obj = null;
+        String query = "SELECT * FROM user WHERE username = ? AND password = ?";
+
+        try {
+            PreparedStatement pr = DBConnector.getInstance().prepareStatement(query);
+            pr.setString(1, uName);
+            pr.setString(2, password);
+            ResultSet rs = pr.executeQuery();
+            if (rs.next()) {
+                switch (rs.getString("usertype")) {
+                    case "operator":
+                        obj = new Operator();
+                        break;
+                    default:
+                        obj = new User();
+                }
+
+                obj.setId(rs.getInt("id"));
+                obj.setName(rs.getString("name"));
+                obj.setUserName(rs.getString("username"));
+                obj.setPassword(rs.getString("password"));
+                obj.setUserType(rs.getString("usertype"));
+
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return obj;
+    }
+
 
     public static boolean delete(int id) {
         String query = "DELETE FROM user WHERE id = ?";
         ArrayList<Course> courseArrayList = Course.getListByUser(id);
-        for (Course course : courseArrayList){
+        for (Course course : courseArrayList) {
             Course.delete(course.getId());
         }
 
@@ -251,11 +283,11 @@ public class User {
 
     public static String searchQuery(String name, String uname, String type) {
         String query = "SELECT * FROM user WHERE username LIKE '%{{uname}}%' AND name LIKE '%{{name}}%'";
-        query=query.replace("{{uname}}",uname);
-        query=query.replace("{{name}}",name);
-        if(!type.isEmpty()){
-            query+="AND usertype ='{{type}}'";
-            query=query.replace("{{type}}",type);
+        query = query.replace("{{uname}}", uname);
+        query = query.replace("{{name}}", name);
+        if (!type.isEmpty()) {
+            query += "AND usertype ='{{type}}'";
+            query = query.replace("{{type}}", type);
         }
         return query;
     }
